@@ -1,4 +1,5 @@
 //axios import buraya gelecek
+import axios from "axios";
 
 var benimIP;
 
@@ -7,25 +8,25 @@ var benimIP;
 // licensed to Ergineer 2022
 require("babel-core/register");
 require("babel-polyfill");
-async function ipAdresimiAl(){
+async function ipAdresimiAl() {
 	await axios({
 		method: 'get',
 		url: 'https://apis.ergineer.com/ipadresim',
 	})
-	.then(function (response) {
-		return response.data
-	})
-	.then(function (a) {
-		benimIP=a
-	});
-}				
+		.then(function (response) {
+			return response.data
+		})
+		.then(function (a) {
+			benimIP = a
+		});
+}
 // ------------ değiştirmeyin --------------
 
 
 /*
 	ADIM 1: axios kullanarak, aşağıdaki URL'ye GET sorgusu atacağız
-    (tag içindeki yere kendi ipnizi yazarak URL'yi oluşturun):
-    https://apis.ergineer.com/ipgeoapi/<ipniz>
+	(tag içindeki yere kendi ipnizi yazarak URL'yi oluşturun):
+	https://apis.ergineer.com/ipgeoapi/<ipniz>
 	
 	NOT: Bilgisayarın IP adresini öğrenmek için: https://apis.ergineer.com/ipadresim 
 	ADIM 5'e gelene kadar fonksiyonunuzu test etmek için ip nizi URL'ye manuel olarak ekleyebilirsiniz.
@@ -38,7 +39,7 @@ async function ipAdresimiAl(){
 */
 /*
 	ADIM 3: Argümanı sadece 1 nesne kabül eden bir fonksiyon oluşturun.
-    DOM metotlarını ve özelliklerini kullanarak, şunları gerçekleştirin:
+	DOM metotlarını ve özelliklerini kullanarak, şunları gerçekleştirin:
 	
 	<div class="card">
 	<img src={ülke bayrağı url} />
@@ -51,7 +52,7 @@ async function ipAdresimiAl(){
 		<p>Para birimi: {para birimi}</p>
 		<p>ISP: {isp}</p>
 	</div>
-    </div>
+	</div>
 */
 
 /*
@@ -70,3 +71,61 @@ async function ipAdresimiAl(){
 
 
 //kodlar buraya gelecek
+
+ipAdresimiAl().then(() => {
+
+
+	const apiPromise = axios.get("https://apis.ergineer.com/ipgeoapi/" + benimIP);
+
+
+	const weatherCard = (dataFromApi) => {
+
+
+		const divCard = document.createElement("div");
+		const imgCard = document.createElement("img");
+		const divInfo = document.createElement("div");
+		const h3Card = document.createElement("h3");
+		const pCountry = document.createElement("p");
+		const pLocation = document.createElement("p");
+		const pCity = document.createElement("p");
+		const pTimezone = document.createElement("p");
+		const pCurrency = document.createElement("p");
+		const pISP = document.createElement("p");
+
+		divCard.append(imgCard);
+		divCard.append(divInfo);
+		divInfo.append(h3Card);
+		divInfo.append(pCountry);
+		divInfo.append(pLocation);
+		divInfo.append(pCity);
+		divInfo.append(pTimezone);
+		divInfo.append(pCurrency);
+		divInfo.append(pISP);
+
+
+		divCard.classList.add("card");
+		imgCard.setAttribute("src", `https://flagcdn.com/w320/${dataFromApi["ülkeKodu"].toLowerCase()}.png`);
+		// imgCard.setAttribute("src", dataFromApi["ülkebayrağı"]);
+		divInfo.classList.add("card-info");
+		h3Card.className = "ip";
+		h3Card.textContent = benimIP;
+		pCountry.className = "ulke";
+		pCountry.textContent = `${dataFromApi["ülke"]} (${dataFromApi["ülkeKodu"]})`;
+		pLocation.textContent = `Enlem: ${dataFromApi.enlem}  Boylam: ${dataFromApi.boylam} `;
+		pCity.textContent = `Şehir: ${dataFromApi["bölgeAdı"]} `;
+		pTimezone.textContent = `Saat dilimi: ${dataFromApi.saatdilimi} `;
+		pCurrency.textContent = `Para birimi: ${dataFromApi.parabirimi}`;
+		pISP.textContent = `ISP: ${dataFromApi.isp}`;
+
+		// console.log(dataFromApi);
+		return divCard;
+	};
+
+	// console.log(weatherCard());
+
+	apiPromise.then((response) => {
+		console.log(response.data)
+		document.querySelector(".cards").append(weatherCard(response.data));
+	});
+
+});
